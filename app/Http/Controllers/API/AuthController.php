@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\TokenResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -71,8 +72,16 @@ class AuthController extends Controller
         //
     }
 
-    public function check()
+    /**
+     * Проверка авторизации
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function check(Request $request): JsonResponse
     {
-        //
+        return new JsonResponse([
+            'success' => auth()->check(),
+        ]);
     }
 }
