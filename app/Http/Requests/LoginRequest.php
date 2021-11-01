@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Foundation\Http\FormRequest;
+
 /**
  * @request LoginRequest
  * @property string $email
  * @property string $password
  */
-class LoginRequest extends ApiRequest
+class LoginRequest extends FormRequest
 {
     /**
      * @return bool
@@ -23,7 +25,7 @@ class LoginRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users',
+            'email' => 'required|email',
             'password' => 'required|min:6',
         ];
     }

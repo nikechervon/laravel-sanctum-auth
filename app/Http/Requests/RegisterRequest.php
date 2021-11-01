@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Foundation\Http\FormRequest;
+
 /**
  * @request LoginRequest
  * @property string $email
  * @property string $password
  */
-class RegisterRequest extends ApiRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * @return bool

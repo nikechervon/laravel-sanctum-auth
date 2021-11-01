@@ -3,7 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -34,8 +35,18 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (ValidationException $e) {
+
+            $response = [
+                'message' => 'Ошибка валидации',
+                'errors' => [],
+            ];
+
+            foreach ($e->errors() as $field => $message) {
+                $response['errors'][] = ['field' => $field, 'message' => $message[0]];
+            }
+
+            throw new HttpResponseException(response()->json($response));
         });
     }
 }

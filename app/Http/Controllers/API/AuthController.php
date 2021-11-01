@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Actions\LoginAction;
 use App\Actions\RegisterAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\TokenResource;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @controller AuthController
@@ -13,9 +16,15 @@ use App\Http\Resources\TokenResource;
  */
 class AuthController extends Controller
 {
-    public function login()
+    /**
+     * @param LoginRequest $request
+     * @return TokenResource
+     * @throws ValidationException
+     */
+    public function login(LoginRequest $request): TokenResource
     {
-        //
+        $token = LoginAction::run($request->email, $request->password);
+        return new TokenResource($token);
     }
 
     /**
