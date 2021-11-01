@@ -1,0 +1,44 @@
+version: "3"
+services:
+
+    nginx:
+        image: nginx:alpine
+        restart: always
+        container_name: "wm_studio_nginx"
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        depends_on:
+            - app
+
+    app:
+        image: fp_app:alpine
+        restart: always
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        container_name: "wm_studio_app"
+        volumes:
+            - ./:/var/www
+        stdin_open: true
+        tty: true
+        depends_on:
+            - mysql
+        ports:
+            - "6001:6001"
+
+    mysql:
+        container_name: "wm_studio_mysql"
+        restart: always
+        image: mysql:8
+        env_file:
+            - ./docker/mysql/.env
+        volumes:
+            - mysql_data:/var/lib/mysqli/data
+        ports:
+            - "3307:3306"
+
+volumes:
+    mysql_data:

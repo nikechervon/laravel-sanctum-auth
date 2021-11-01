@@ -1,0 +1,28 @@
+## Build server
+FROM golang:1.13-alpine AS build-backend
+ADD ./docker/stream/main.go /go/src/github.com/Roverr/rtsp-stream/main.go
+ADD ./docker/stream/core /go/src/github.com/Roverr/rtsp-stream/core
+ADD ./docker/stream/Gopkg.toml /go/src/github.com/Roverr/rtsp-stream/Gopkg.toml
+WORKDIR /go/src/github.com/Roverr/rtsp-stream
+RUN apk add --update nodejs nodejs-npm git
+RUN go get -u github.com/golang/dep/cmd/dep
+RUN dep ensure -v
+RUN go build -o server
+
+## Build UI
+FROM node:lts-slim as build-ui
+ADD ./docker/stream/ui /tmp/ui
+WORKDIR /tmp/ui
+RUN npm install
+RUN echo API_URL=http://127.0.0.1:8080 > ./src/.env
+RUN npm run build
+
+## Creating potential production image
+FROM woahbase/alpine-supervisor:x86_64
+RUN apk update && apk add bash ca-certificates ffmpeg nodejs npm && rm -rf /var/cache/apk/*
+RUN npm install http-server -g
+COPY ./docker/stream/build/management/supervisord.conf /etc/supervisord.conf
+WORKDIR /stream
+COPY --from=build-backend /go/src/github.com/Roverr/rtsp-stream/server /stream/
+COPY ./docker/stream/build/rtsp-stream.yml /stream/rtsp-stream.yml
+#COPY --from=build-ui /tmp/ui/dist /ui/
