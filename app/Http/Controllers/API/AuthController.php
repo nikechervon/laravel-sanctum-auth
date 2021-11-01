@@ -62,16 +62,6 @@ class AuthController extends Controller
         return new TokenResource($token);
     }
 
-    public function reset()
-    {
-        //
-    }
-
-    public function resetCheck()
-    {
-        //
-    }
-
     /**
      * Проверка авторизации
      *
