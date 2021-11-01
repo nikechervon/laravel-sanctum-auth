@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Actions\LoginAction;
+use App\Actions\RefreshTokenAction;
 use App\Actions\RegisterAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\TokenResource;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -16,6 +18,14 @@ use Illuminate\Validation\ValidationException;
  */
 class AuthController extends Controller
 {
+    /**
+     * @constructor AuthController
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->only('refresh', 'check');
+    }
+
     /**
      * @param LoginRequest $request
      * @return TokenResource
@@ -39,9 +49,16 @@ class AuthController extends Controller
         return new TokenResource($token);
     }
 
-    public function refresh()
+    /**
+     * Обновление токена авторизации
+     *
+     * @param Request $request
+     * @return TokenResource
+     */
+    public function refresh(Request $request): TokenResource
     {
-        //
+        $token = RefreshTokenAction::run($request);
+        return new TokenResource($token);
     }
 
     public function reset()
